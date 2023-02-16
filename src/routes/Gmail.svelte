@@ -43,7 +43,19 @@
   };
 
   const borrarTarea = async (id: any) => {
-    await deleteDoc(doc(db, userData.email, id));
+    try {
+      await deleteDoc(doc(db, userData.email, id));
+      succes = "Mensaje borrado correctamente";
+      suc = true;
+    } catch (error) {
+      error = "Error en borrar mensaje";
+      er = true;
+      console.error(error);
+    }
+    setTimeout(() => {
+      suc = false;
+      er = false;
+    }, 1000);
   };
 
   const enviarMensaje = async (e: Event) => {
@@ -59,6 +71,10 @@
       er = true;
       console.error(error);
     }
+    setTimeout(() => {
+      suc = false;
+      er = false;
+    }, 1000);
     mensaje = {
       enviador: userData.email as string,
       destinatario: "" as string,
@@ -130,7 +146,10 @@
   </div>
   <div class="sidebar">
     <div class="logo">
-      <img src="src/img/gmail.svg" alt="" />
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Gmail_icon_%282020%29.svg/320px-Gmail_icon_%282020%29.svg.png"
+        alt=""
+      />
       <h1>Gmail</h1>
     </div>
     <div class="datos-sidebar">
@@ -167,6 +186,7 @@
       </div>
       <form action="" on:submit={enviarMensaje}>
         <input
+          autofocus
           bind:value={mensaje.destinatario}
           type="text"
           placeholder="Destinatario"
@@ -216,7 +236,7 @@
     gap: 10px;
   }
   .logo > img {
-    width: 40px;
+    width: 50px;
     height: 40px;
   }
   .icon {
@@ -230,34 +250,52 @@
   }
   .error,
   .succes {
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
     position: absolute;
+    visibility: hidden;
     width: 300px;
     z-index: 4;
     height: 50px;
-    top: 110%;
+    transition: ease in 0.4s;
+    top: 90%;
+    opacity: 0;
     left: 5%;
+    border-radius: 5px;
+    font-size: 1rem;
   }
   @keyframes notificacion {
     0% {
-      top: 110%;
+      top: 90%;
+      visibility: visible;
+      opacity: 0.25;
+    }
+    25% {
+      opacity: 0.75;
     }
     50% {
       top: 90%;
-      display: flex;
+      opacity: 1;
+      visibility: visible;
     }
     100% {
-      top: 110%;
+      visibility: hidden;
+      top: 90%;
     }
   }
   .error {
     background-color: red;
+    animation-duration: 1.5s;
+    animation-iteration-count: 1;
   }
   .succes {
     animation-name: notificacion;
     animation-duration: 1s;
-    animation-iteration-count: 1;
+    animation-iteration-count: 1.5;
     background-color: white;
-    color: blue;
+    color: var(--azul);
   }
   .userData {
     z-index: 4;
