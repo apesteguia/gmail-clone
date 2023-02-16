@@ -24,6 +24,7 @@
   let er: boolean = false;
   let succes: string = "";
   let suc: boolean = false;
+  let visualilzar: boolean = false;
 
   export let userData = {
     name: "" as string,
@@ -40,6 +41,7 @@
     destinatario: "" as string,
     asunto: "" as string,
     texto: "" as string,
+    photo: userData.photo as string,
   };
 
   const borrarTarea = async (id: any) => {
@@ -80,10 +82,20 @@
       destinatario: "" as string,
       asunto: "" as string,
       texto: "" as string,
+      photo: userData.photo as string,
     };
     redactar = !redactar;
   };
 
+  const verMensaje = (currentID: string) => {
+    id = emails.filter((elemento: any) => {
+      return elemento.id === currentID;
+    });
+    visualilzar = !visualilzar;
+    console.log(id);
+  };
+  let id: any = {};
+  let em: any = {};
   let emails: any = [];
 
   const unsub = onSnapshot(collection(db, userData.email), (QuerySnapshot) => {
@@ -142,6 +154,7 @@
         >
       </div>
     {/if}
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <img on:click={quitarElementos} src={userData.photo} alt="" />
   </div>
   <div class="sidebar">
@@ -162,15 +175,28 @@
   </div>
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div class="entrada" on:click={() => (userd = false)}>
+    {#if visualilzar === true}
+      <div class="aud" on:click={() => (visualilzar = !visualilzar)}>
+        <div class="vermensaje">
+          <div class="bar">
+            <button><Icon icon="ic:baseline-close" /></button>
+          </div>
+          <p>{id[0].asunto}</p>
+          <img src={id[0].photo} alt="" />
+          <p>{id[0].enviador}</p>
+          <p>{id[0].texto}</p>
+        </div>
+      </div>
+    {/if}
     <div class="entrada2">
       {#each emails as email}
         <div class="email">
           <button class="icon" on:click={borrarTarea(email.id)}>
             <Icon icon="ph:trash-fill" />
           </button>
-          <p>{email.enviador}</p>
-          <p>{email.asunto}</p>
-          <p>{email.texto}</p>
+          <p on:click={verMensaje(email.id)}>{email.enviador}</p>
+          <p on:click={verMensaje(email.id)}>{email.asunto}</p>
+          <p on:click={verMensaje(email.id)}>{email.texto}</p>
         </div>
       {/each}
     </div>
@@ -238,6 +264,43 @@
   .logo > img {
     width: 50px;
     height: 40px;
+  }
+  .vermensaje {
+    display: flex;
+    flex-direction: column;
+    z-index: 5;
+    color: black;
+    background-color: white;
+    margin-left: 295px;
+    width: 90%;
+    z-index: 5;
+    margin-top: 79px;
+    overflow: hidden;
+  }
+  .bar {
+    width: 100%;
+    background-color: var(--background2);
+    height: 50px;
+  }
+  .vermensaje > img {
+    width: 80px;
+    margin-left: 40px;
+    height: 80px;
+    margin-top: 30px;
+    border-radius: 999px;
+  }
+  .email > img {
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+  }
+  .aud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
   }
   .icon {
     background-color: var(--background);
@@ -431,6 +494,7 @@
   }
   .email {
     overflow: hidden;
+    cursor: pointer;
     font-size: 0.9rem;
     height: 50px;
     border-bottom: 1px solid rgb(128, 128, 128);
@@ -453,7 +517,10 @@
   }
   .email > :nth-child(4) {
     color: rgb(206, 206, 206);
-    margin-left: 10px;
+    margin-left: 50px;
+  }
+  .email > :nth-child(5) {
+    margin-left: 30px;
   }
   .submit {
     width: 100%;
