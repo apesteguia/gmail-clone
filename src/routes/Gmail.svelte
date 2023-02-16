@@ -14,12 +14,25 @@
     updateDoc,
   } from "firebase/firestore";
   import { destroy_block } from "svelte/internal";
+  import Icon from "@iconify/svelte";
 
   let redactar: boolean = false;
+  let userd: boolean = false;
+  let busqueda: string = "";
+  let bus: boolean = false;
+  let error: string = "";
+  let er: boolean = false;
+  let succes: string = "";
+  let suc: boolean = false;
 
   export let userData = {
     name: "" as string,
     email: "" as string,
+    photo: "" as string,
+  };
+
+  const quitarElementos = () => {
+    userd = !userd;
   };
 
   let mensaje = {
@@ -29,13 +42,21 @@
     texto: "" as string,
   };
 
+  const borrarTarea = async (id: any) => {
+    await deleteDoc(doc(db, userData.email, id));
+  };
+
   const enviarMensaje = async (e: Event) => {
     e.preventDefault();
     try {
       if (mensaje.destinatario !== userData.email) {
         await addDoc(collection(db, mensaje.destinatario), mensaje);
       }
+      succes = "Mensaje enviado correctamente";
+      suc = true;
     } catch (error) {
+      error = "Error en envio de mensaje";
+      er = true;
       console.error(error);
     }
     mensaje = {
@@ -56,10 +77,57 @@
     console.log(emails);
   });
   onDestroy(unsub);
+  console.log("PHOTO" + userData.photo);
 </script>
 
 <div class="gmail">
-  <div class="navbar" />
+  {#if er === true}
+    <div class="error">
+      <p>{error}</p>
+    </div>
+  {/if}
+  {#if suc === true}
+    <div class="succes">
+      <p>{succes}</p>
+    </div>
+  {/if}
+  <div class="navbar">
+    <div class="buscar">
+      <div>
+        <Icon icon="material-symbols:search" />
+      </div>
+      <input
+        bind:value={busqueda}
+        on:focus={() => (bus = !bus)}
+        class="i"
+        type="text"
+        placeholder="Busca mensajes"
+      />
+      {#if busqueda !== ""}
+        <div>
+          <button on:click={() => (busqueda = "")}>
+            <Icon icon="material-symbols:close" />
+          </button>
+        </div>
+      {/if}
+    </div>
+    {#if userd === true}
+      <div class="userData">
+        <div>
+          <img src={userData.photo} alt="" />
+          <div>
+            <p>{userData.name}</p>
+            <p>{userData.email}</p>
+          </div>
+        </div>
+        <button
+          ><Icon icon="material-symbols:door-open-outline-rounded" />Cerrar
+          Sesion</button
+        >
+      </div>
+    {/if}
+    <img on:click={quitarElementos} src={userData.photo} alt="" />
+  </div>
   <div class="sidebar">
     <div class="logo">
       <img src="src/img/gmail.svg" alt="" />
@@ -73,11 +141,14 @@
       </div>
     </div>
   </div>
-  <div class="entrada">
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <div class="entrada" on:click={() => (userd = false)}>
     <div class="entrada2">
       {#each emails as email}
         <div class="email">
-          <button>Borrar</button>
+          <button class="icon" on:click={borrarTarea(email.id)}>
+            <Icon icon="ph:trash-fill" />
+          </button>
           <p>{email.enviador}</p>
           <p>{email.asunto}</p>
           <p>{email.texto}</p>
@@ -148,6 +219,142 @@
     width: 40px;
     height: 40px;
   }
+  .icon {
+    background-color: var(--background);
+    font-size: 1rem;
+    color: red;
+    cursor: pointer;
+    transition: 0.3s;
+    outline: none;
+    border: none;
+  }
+  .error,
+  .succes {
+    position: absolute;
+    width: 300px;
+    z-index: 4;
+    height: 50px;
+    top: 110%;
+    left: 5%;
+  }
+  @keyframes notificacion {
+    0% {
+      top: 110%;
+    }
+    50% {
+      top: 90%;
+      display: flex;
+    }
+    100% {
+      top: 110%;
+    }
+  }
+  .error {
+    background-color: red;
+  }
+  .succes {
+    animation-name: notificacion;
+    animation-duration: 1s;
+    animation-iteration-count: 1;
+    background-color: white;
+    color: blue;
+  }
+  .userData {
+    z-index: 4;
+    height: 200px;
+    width: 380px;
+    background-color: var(--background2);
+    position: absolute;
+    top: 70px;
+    right: 40px;
+    border-radius: 19px;
+    overflow: hidden;
+  }
+  .userData > div > img {
+    margin-top: 10px;
+    margin-left: 10px;
+    width: 80px;
+    height: 80px;
+    border-radius: 999px;
+  }
+  .userData > div {
+    margin-left: 10px;
+    display: flex;
+    gap: 40px;
+  }
+  .userData > button {
+    margin-top: 30px;
+    border: none;
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: red;
+    color: white;
+    gap: 10px;
+    height: 30px;
+    margin-left: 140px;
+  }
+  .userData > div > div {
+    margin-top: 10px;
+  }
+  .userData > div > div > :nth-child(1) {
+    text-transform: capitalize;
+    font-size: 1.1rem;
+  }
+  .userData > div > div > :nth-child(2) {
+    color: rgb(164, 164, 164);
+  }
+  .buscar {
+    position: absolute;
+    left: 310px;
+    border-radius: 5px;
+    width: 50%;
+    display: flex;
+    background-color: var(--background2);
+    align-items: center;
+  }
+  .buscar > :nth-child(1) {
+    position: absolute;
+    top: 18px;
+    left: 10px;
+    z-index: 5;
+    color: red;
+  }
+  .buscar > :nth-child(3) {
+    top: 16px;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    left: 90%;
+    background-color: transparent;
+  }
+  .buscar > :nth-child(3) > button {
+    color: red;
+    font-size: 1.2rem;
+    border: none;
+    background-color: transparent;
+  }
+  .buscar > input {
+    height: 50px;
+    text-indent: 35px;
+    font-size: 1rem;
+    width: 100%;
+    border-radius: 5px;
+    background-color: var(--background2);
+    outline: none;
+    border: none;
+    color: white;
+  }
+  .buscar > input:focus {
+    color: black;
+    background-color: white;
+  }
+  .icon:hover {
+    transition: 0.3s;
+    transform: scale(1.2);
+  }
   .sidebar {
     position: absolute;
     width: 300px;
@@ -194,9 +401,13 @@
     text-align: center;
     background-color: var(--background);
   }
+  .email > :nth-child(1) {
+    margin-left: 5px;
+  }
   .email > :nth-child(2) {
     font-size: 1rem;
     font-weight: bolder;
+    margin-left: 20px;
   }
   .email > :nth-child(3) {
     margin-left: 40px;
@@ -307,6 +518,13 @@
     width: 70%;
     color: white;
     font-size: 1rem;
+  }
+  .navbar > img {
+    cursor: pointer;
+    margin-right: 30px;
+    height: 40px;
+    width: 40px;
+    border-radius: 999px;
   }
   .navbar {
     align-items: center;

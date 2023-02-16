@@ -14,6 +14,7 @@
   export let userData = {
     name: "" as string,
     email: "" as string,
+    photo: "" as string,
   };
 
   let mostrar: boolean = false;
@@ -26,7 +27,8 @@
         console.log(user);
         userData.email = user.email as string;
         userData.name = user.displayName as string;
-        //console.log(user);
+        userData.photo = user.photoURL as string;
+        console.log(user);
         mostrar = true;
       })
       .catch((error) => {
