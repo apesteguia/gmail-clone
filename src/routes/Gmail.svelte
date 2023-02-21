@@ -163,7 +163,7 @@
         src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Gmail_icon_%282020%29.svg/320px-Gmail_icon_%282020%29.svg.png"
         alt=""
       />
-      <h1>Gmail</h1>
+      <h1>FireMail</h1>
     </div>
     <div class="datos-sidebar">
       <button on:click={() => (redactar = !redactar)}>Redactar</button>
@@ -322,7 +322,7 @@
     width: 300px;
     z-index: 4;
     height: 50px;
-    transition: ease in 0.4s;
+    transition: ease in 10s;
     top: 90%;
     opacity: 0;
     left: 5%;
@@ -350,13 +350,13 @@
   }
   .error {
     background-color: red;
-    animation-duration: 1.5s;
+    animation-duration: 5s;
     animation-iteration-count: 1;
   }
   .succes {
     animation-name: notificacion;
-    animation-duration: 1s;
-    animation-iteration-count: 1.5;
+    animation-duration: 5s;
+    animation-iteration-count: 1;
     background-color: white;
     color: var(--azul);
   }
